@@ -17,7 +17,9 @@ import "@/permission"; // permission control
 
 import * as API from "@/api/product/index";
 import CategorySelector from "@/components/CategorySelector";
+import HintButton from "@/components/HintButton";
 Vue.component("CategorySelector", CategorySelector);
+Vue.component("HintButton", HintButton);
 // API就是下面这个对象
 // {
 //   trademark:{},

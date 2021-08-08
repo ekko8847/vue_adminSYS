@@ -149,6 +149,7 @@ export default {
     this.getTrademarkList();
   },
   methods: {
+    //请求数据
     async getTrademarkList(page = 1) {
       this.page = page;
       const result = await this.$API.trademark.getPageList(
@@ -161,6 +162,7 @@ export default {
         this.total = result.data.total;
       }
     },
+    //切换每页显示数量(会默认传size过来)
     handleSizeChange(size) {
       this.limit = size;
       this.getTrademarkList();
