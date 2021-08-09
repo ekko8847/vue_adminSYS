@@ -1,6 +1,7 @@
 <template>
-  <!-- 三级联动 -->
-  <el-form :inline="true" :model="cForm">
+  <!-- 三级联动(跟列表页是同步的,列表页为true就不禁用) -->
+
+  <el-form :inline="true" :model="cForm" :disabled="!isShowList">
     <el-form-item label="一级分类">
       <!-- select和option必须要有value属性，不写就报警告 -->
       <!-- select收集的就是选中的option的value值
@@ -54,6 +55,7 @@
 <script>
 export default {
   name: "CategorySelector",
+  props: ["isShowList"],
   data() {
     return {
       category1List: [],

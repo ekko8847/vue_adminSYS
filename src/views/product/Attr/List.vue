@@ -1,7 +1,10 @@
 <template>
   <div>
     <el-card>
-      <CategorySelector @changeCategory="changeCategory"></CategorySelector>
+      <CategorySelector
+        @changeCategory="changeCategory"
+        :isShowList="isShowList"
+      ></CategorySelector>
     </el-card>
     <el-card style="margin-top: 20px">
       <!-- 列表页 -->
@@ -46,13 +49,19 @@
                 @click="showUpdateDiv(row)"
               >
               </HintButton>
-              <HintButton
-                type="danger"
-                icon="el-icon-delete"
-                size="mini"
-                title="删除"
+              <el-popconfirm
+                :title="`你确定删除${row.attrName}`"
+                @onConfirm="deleteAttr(row)"
               >
-              </HintButton>
+                <HintButton
+                  slot="reference"
+                  type="danger"
+                  icon="el-icon-delete"
+                  size="mini"
+                  title="删除"
+                >
+                </HintButton>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -101,10 +110,27 @@
               >
             </template>
           </el-table-column>
+          <el-table-column prop="prop" label="操作" width="width">
+            <template slot-scope="{ row, $index }">
+              <el-popconfirm
+                :title="`你确定删除${row.valueName}吗?`"
+                @onConfirm="attrForm.attrValueList.splice($index, 1)"
+              >
+                <HintButton
+                  slot="reference"
+                  type="danger"
+                  icon="el-icon-delete"
+                  size="mini"
+                  title="删除"
+                ></HintButton>
+              </el-popconfirm>
+            </template>
+          </el-table-column>
         </el-table>
         <el-button
           type="primary"
           :disabled="attrForm.attrValueList.length === 0"
+          @click="save"
           >保存</el-button
         >
         <el-button @click="isShowList = true">取消</el-button>
@@ -114,6 +140,13 @@
 </template>
 
 <script>
+/*  // 在vue当中，响应式的数据处理，对于数组和对象是不一样的
+    // 数组只要用到了重写的7个方法，那么内部所有的东西一定是响应式
+    // 对象的响应式数据是靠数据劫持（数据监视）
+    // 对于我们初始化的data数据，一上来data里面就有的所有对象的属性（无论是外层还是内层的属性），
+    // 都添加get和set方法达到响应式的目的，只要修改这些属性，set方法当中就会修改页面
+    // 但是对于我们的对象来说只是一开始data里面的所有属性都添加了响应式，而后期自己给我们的响应式对象添加的属性
+    // 通过点语法，添加的属性不是响应式，因为此时数据劫持和数据监视早都已经完成了 */
 import cloneDeep from "lodash/cloneDeep";
 export default {
   name: "Attr",
@@ -180,7 +213,7 @@ export default {
         this.attrList = result.data;
       }
     },
-    //切换div模块显示
+    //切换div模块显示 点击列表页添加
     showAddDiv() {
       this.isShowList = false;
       // 解决添加属性取消后再次点击添加，数据依然存在的问题
@@ -194,16 +227,20 @@ export default {
     // 点击列表页的修改按钮
     showUpdateDiv(row) {
       this.isShowList = false;
+      //深度克隆目的是解决点击取消后同步修改(内部和外部)
       this.attrForm = cloneDeep(row);
       this.attrForm.attrValueList.forEach(item => {
         //这样添加isEdit就是响应式
         this.$set(item, "isEdit", false);
       });
     },
-    // 每个属性值都有自己特定的模式
-    // 每个新添加的属性值，一上来应该是显示input  编辑模式
-    // 每个老的属性值，一上来应该是显示span   查看模式
+
+    //点击修改属性值
+    /* 每个新添加的属性值，一上来应该是显示input  编辑模式;
+    每个老的属性值，一上来应该是显示span   查看模式 */
     addAttrValue() {
+      // 添加属性值和添加属性没关系
+      // 添加属性的时候可以添加属性值，修改属性的时候，也可以添加属性值
       this.attrForm.attrValueList.push({
         attrId: this.attrForm.id,
         valueName: "",
@@ -216,11 +253,12 @@ export default {
     // 点击span切换为input  从查看模式切换为编辑模式
     toEdit(row, index) {
       row.isEdit = true;
+      //避免input还没创建好
       this.$nextTick(() => {
         this.$refs[index].focus();
       });
     },
-    // input失去焦点或者回车切换为span 从编辑模式切换为查看模式
+    // input失去焦点或者回车切换为span 从编辑模式切换为查看模式,同时查看的时候需要对输入的内容做判断
     toLook(row) {
       let attrValueName = row.valueName;
       if (attrValueName.trim() === "") {
@@ -238,6 +276,49 @@ export default {
         return;
       }
       row.isEdit = false;
+    },
+    async save() {
+      let attr = this.attrForm;
+      //必须不为空且将自己添加的isEdit去掉
+      attr.attrValueList.filter(item => {
+        if (item.valueName !== "") {
+          delete item.isEdit;
+          //filter返回值必须为true
+          return true;
+        }
+      });
+      //当添加的属性值为空时,不发请求
+      if (attr.attrValueList.length === 0) {
+        this.$message.info("属性值至少得有一个!");
+        return;
+      }
+      //开始发请求
+      try {
+        const result = await this.$API.attr.addOrUpdate(attr);
+        if (result.code === 200 || result.code === 20000) {
+          this.$message.success("保存成功!");
+          //重新回到列表页
+          this.isShowList = true;
+          this.getAttrList();
+        } else {
+          this.$message.error("保存失败!");
+        }
+      } catch (error) {
+        this.$message.error("请求数据失败");
+      }
+    },
+    async deleteAttr(row) {
+      try {
+        const result = await this.$API.attr.delete(row.id);
+        if (result.code === 200 || result.code === 20000) {
+          this.$message.success("删除属性成功!");
+          this.getAttrList();
+        } else {
+          this.$message.error("删除失败!");
+        }
+      } catch (error) {
+        this.$message.error("请求失败");
+      }
     }
   }
 };
