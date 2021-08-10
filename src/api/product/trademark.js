@@ -1,5 +1,5 @@
 // 这个文件是专门去写和trademark相关的接口请求函数
-import request from '@/utils/request'
+import request from "@/utils/request";
 
 export default {
   // DELETE /admin/product/baseTrademark/remove/{id}
@@ -10,12 +10,12 @@ export default {
   //   method:'get'
   // })
   // axios.get()
-  delete(id){
-    return request.delete(`/admin/product/baseTrademark/remove/${id}`)
+  delete(id) {
+    return request.delete(`/admin/product/baseTrademark/remove/${id}`);
   },
   // GET /admin/product/baseTrademark/{page}/{limit}
-  getPageList(page,limit){
-    return request.get(`/admin/product/baseTrademark/${page}/${limit}`)
+  getPageList(page, limit) {
+    return request.get(`/admin/product/baseTrademark/${page}/${limit}`);
   },
 
   // 以后我们在添加一个东西的时候,如果是添加不需要id 而如果是修改是需要id的
@@ -27,15 +27,17 @@ export default {
   // 新增BaseTrademark
   // PUT /admin/product/baseTrademark/update
   // 修改BaseTrademark
-  addOrUpdate(trademark){
-    if(trademark.id){
-      // 代表我是再修改
-      return request.put('/admin/product/baseTrademark/update',trademark)
-    }else{
-      // 代表我再添加
-      return request.post('/admin/product/baseTrademark/save',trademark)
+  addOrUpdate(trademark) {
+    if (trademark.id) {
+      // 修改
+      return request.put("/admin/product/baseTrademark/update", trademark);
+    } else {
+      // 添加
+      return request.post("/admin/product/baseTrademark/save", trademark);
     }
+  },
+  //获取所有的品牌列表
+  getList() {
+    return request.get(`/admin/product/baseTrademark/getTrademarkList`);
   }
-
-  
-}
+};

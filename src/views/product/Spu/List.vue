@@ -71,10 +71,16 @@
         </el-pagination>
       </div>
       <!-- 使用.sync实现子向父通信(类似于自定义事件 但子组件里面触发事件写法不同) -->
+      <!-- <SpuForm
+        v-show="isShowSpuForm"
+        :isShowSpuForm="isShowSpuForm"
+        @update:isShowSpuForm="isShowSpuForm = $event"
+      ></SpuForm> -->
       <SpuForm
         ref="spu"
         v-show="isShowSpuForm"
         :isShowSpuForm.sync="isShowSpuForm"
+        @backSuccess="backSuccess"
       ></SpuForm>
       <SkuForm v-show="isShowSkuForm"> </SkuForm>
     </el-card>
@@ -137,12 +143,22 @@ export default {
     //添加spu按钮的回调
     showAddSpuForm() {
       this.isShowSpuForm = true;
-      this.$refs.spu.getAddSpuFormInitData();
+      this.$refs.spu.getAddSpuFormInitData(this.category3Id);
     },
     //修改spu按钮的回调(列表页)
     showUpdateSpuForm(row) {
       this.isShowSpuForm = true;
-      this.$refs.spu.getUpdateSpuFormInitData();
+      this.$refs.spu.getUpdateSpuFormInitData(row, this.category3Id);
+    },
+    //子组件保存成功后的回调
+    backSuccess(spuId) {
+      if (spuId) {
+        // 证明是修改回来的
+        this.getSpuList(this.page);
+      } else {
+        // 证明是添加回来的
+        this.getSpuList();
+      }
     }
   }
 };
