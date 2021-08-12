@@ -106,7 +106,7 @@
     <el-form-item>
       <el-button type="primary" @click="save">保存</el-button>
       <!-- 同步修改父组件数据 -->
-      <el-button @click="$emit('update:isShowSpuForm', false)">取消</el-button>
+      <el-button @click="cancel">取消</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -322,6 +322,10 @@ export default {
     resetData() {
       // this.$options.data是函数，调用完成拿到最初始的data返回的对象
       Object.assign(this._data, this.$options.data());
+    },
+    cancel() {
+      this.$emit("update:isShowSpuForm", false);
+      this.resetData();
     }
   }
 };

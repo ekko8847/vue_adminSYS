@@ -30,6 +30,7 @@
                 size="mini"
                 icon="el-icon-plus"
                 title="添加SKU"
+                @click="showAddSkuForm(row)"
               >
               </HintButton>
               <HintButton
@@ -47,13 +48,19 @@
                 title="查看SPU的SKU列表"
               >
               </HintButton>
-              <HintButton
-                type="danger"
-                size="mini"
-                icon="el-icon-delete"
-                title="删除SKU"
+              <el-popconfirm
+                :title="`确定删除${row.spuName}吗？`"
+                @onConfirm="deleteSpu(row)"
               >
-              </HintButton>
+                <HintButton
+                  slot="reference"
+                  type="danger"
+                  size="mini"
+                  icon="el-icon-delete"
+                  title="删除SPU"
+                >
+                </HintButton>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -82,7 +89,12 @@
         :isShowSpuForm.sync="isShowSpuForm"
         @backSuccess="backSuccess"
       ></SpuForm>
-      <SkuForm v-show="isShowSkuForm"> </SkuForm>
+      <SkuForm
+        v-show="isShowSkuForm"
+        ref="sku"
+        :isShowSkuForm.sync="isShowSkuForm"
+      >
+      </SkuForm>
     </el-card>
   </div>
 </template>
@@ -150,6 +162,16 @@ export default {
       this.isShowSpuForm = true;
       this.$refs.spu.getUpdateSpuFormInitData(row, this.category3Id);
     },
+    //添加sku按钮的回调(列表页)
+    showAddSkuForm(row) {
+      this.isShowSkuForm = true;
+      //row里面包含category3Id(基础属性列表发请求需要)
+      this.$refs.sku.getAddSkuFormInitData(
+        row,
+        this.category1Id,
+        this.category2Id
+      );
+    },
     //子组件保存成功后的回调
     backSuccess(spuId) {
       if (spuId) {
@@ -158,6 +180,21 @@ export default {
       } else {
         // 证明是添加回来的
         this.getSpuList();
+      }
+    },
+    //点击删除spu的回调
+    async deleteSpu(row) {
+      try {
+        const result = await this.$API.spu.remove(row.id);
+        if (result.code === 200 || result.code === 20000) {
+          this.$message.success("删除成功");
+          //删除之后刷新页面看当前页列表长度是否大于1 大于就在当前 否则回上一页
+          this.getSpuList(this.spuList.length > 1 ? this.page : this.page - 1);
+        } else {
+          this.$message.error("删除失败");
+        }
+      } catch (error) {
+        this.$message.error("请求失败", error.message);
       }
     }
   }
