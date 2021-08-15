@@ -59,6 +59,55 @@ export const constantRoutes = [
       //   redirect:'dashboard'
       // }
     ]
+  }
+];
+export const allAsyncRoutes = [
+  //权限数据管理相关的路由
+  {
+    name: "Acl",
+    path: "/acl",
+    component: Layout,
+    redirect: "/acl/user/list",
+    meta: {
+      title: "权限管理",
+      icon: "el-icon-lock"
+    },
+    children: [
+      {
+        name: "User",
+        path: "user/list",
+        component: () => import("@/views/acl/user/list"),
+        meta: {
+          title: "用户管理"
+        }
+      },
+      {
+        name: "Role",
+        path: "role/list",
+        component: () => import("@/views/acl/role/list"),
+        meta: {
+          title: "角色管理"
+        }
+      },
+      {
+        name: "RoleAuth",
+        path: "role/auth/:id",
+        component: () => import("@/views/acl/role/roleAuth"),
+        meta: {
+          activeMenu: "/acl/role/list",
+          title: "角色授权"
+        },
+        hidden: true
+      },
+      {
+        name: "Permission",
+        path: "permission/list",
+        component: () => import("@/views/acl/permission/list"),
+        meta: {
+          title: "菜单管理"
+        }
+      }
+    ]
   },
   // 商品管理相关的
   // 如果一个路由包含了多个二级路由，那么这个路由的redirect没意义
@@ -98,11 +147,10 @@ export const constantRoutes = [
         meta: { title: "平台属性管理" }
       }
     ]
-  },
-
-  // 404 page must be placed at the end !!!
-  { path: "*", redirect: "/404", hidden: true }
+  }
 ];
+// 404 page must be placed at the end !!!
+export const anyRoute = { path: "*", redirect: "/404", hidden: true };
 
 const createRouter = () =>
   new Router({

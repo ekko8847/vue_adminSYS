@@ -15,7 +15,7 @@ import router from "./router";
 import "@/icons"; // icon
 import "@/permission"; // permission control
 
-import * as API from "@/api/product/index";
+import * as API from "@/api/index";
 import CategorySelector from "@/components/CategorySelector";
 import HintButton from "@/components/HintButton";
 Vue.component("CategorySelector", CategorySelector);

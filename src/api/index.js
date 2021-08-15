@@ -7,11 +7,14 @@
 // export attr
 // 上面的写法先引入进来，然后再分别暴露出去是理解，写法是错的
 // 下面才是真正的引入并暴露的写法
-export { default as trademark } from "./trademark";
-export { default as attr } from "./attr";
-export { default as category } from "./category";
-export { default as spu } from "./spu";
-export { default as sku } from "./sku";
+export { default as trademark } from "./product/trademark";
+export { default as attr } from "./product/attr";
+export { default as category } from "./product/category";
+export { default as spu } from "./product/spu";
+export { default as sku } from "./product/sku";
+export { default as permission } from "./acl/permission";
+export { default as role } from "./acl/role";
+export * as user from "./acl/user";
 // 相当于
 // import trademark from './trademark'  先引入
 // export trademark 再分别暴露
