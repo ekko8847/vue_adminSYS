@@ -15,9 +15,9 @@
     <el-table-column prop="name" label="分类名称" sortable />
 
     <el-table-column label="操作" width="250" align="center">
-      <!-- <template slot="header">
+      <template slot="header">
         <el-input placeholder="按Enter键添加一级分类" />
-      </template> -->
+      </template>
 
       <template slot-scope="scope">
         <HintButton
