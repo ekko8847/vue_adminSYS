@@ -1,0 +1,21 @@
+## 权限管理
+- 3个重要数据(后台保存的)
+  - 用户: 
+    - id
+    - name
+    - roleIds: 保存对应角色的id数组
+  - 角色: 
+    - id
+    - name
+    - permissionIds: 保存对应权限的id数组
+  - 权限: 
+    - 路由/页面级别权限
+      - id
+      - name
+      - type: 1   代表当前是路由权限
+      - code: 标识名称, 路由配置的name(每个路由的name都是唯一的, 如: Category)
+    - 按钮级别权限
+      - id
+      - name
+      - type: 2 代表当前是按钮权限
+      - code: 标识名称, 给按钮取的标识名称(不同按钮的值不一样, 如: btn.Category.add)
